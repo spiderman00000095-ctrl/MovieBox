@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MovieBox Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-color: #08080a;
+      color: #ffffff;
+      padding-bottom: 40px;
+    }
+
+    /* Tiiny Host Ad Strip Hide */
+    div[class*="tiiny"], div[id*="tiiny"], iframe[src*="tiiny"], .tiiny-branding {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      height: 0 !important;
+    }
+
+    /* Custom Splash Screen */
+    #splashScreen {
+      position: fixed;
+      inset: 0;
+      background: #08080a;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.5s ease;
+    }
+    .splash-logo-img {
+      width: 85%;
+      max-width: 320px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 24px;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 30px rgba(229, 9, 20, 0.55));
+      animation: pulse 1.8s infinite alternate;
+    }
+    .splash-loader {
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid rgba(255, 255, 255, 0.1);
+      border-top: 3.5px solid #e50914;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.96); }
+      100% { transform: scale(1.04); }
+    }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 8, 10, 0.88);
+      backdrop-filter: blur(16px);
+      padding: 14px 16px 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(45deg, #e50914, #ff4d58);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .app-ver {
+      font-size: 11px;
+      color: #666;
+      font-weight: 600;
+    }
+    .search-wrapper {
+      position: relative;
+    }
+    .search-box {
+      width: 100%;
+      background: #141418;
+      border: 1px solid #23232a;
+      border-radius: 12px;
+      padding: 10px 16px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .search-box:focus {
+      border-color: #e50914;
+      box-shadow: 0 0 12px rgba(229, 9, 20, 0.35);
+    }
+    .search-box::placeholder {
+      color: #666;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      position: relative;
+      margin: 12px 16px 16px 16px;
+      height: 220px;
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.4) 50%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px;
+    }
+    .hero-tag {
+      background: #e50914;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      width: fit-content;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+    .hero-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hero-btn {
+      background: #fff;
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 8px;
+      width: fit-content;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Categories */
+    .cat-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 6px 16px 14px 16px;
+      scrollbar-width: none;
+    }
+    .cat-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .cat-pill {
+      background: #141418;
+      color: #888;
+      padding: 8px 18px;
+      border-radius: 25px;
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      border: 1px solid #202026;
+      transition: all 0.25s ease;
+    }
+    .cat-pill.active {
+      background: linear-gradient(135deg, #e50914, #b20710);
+      color: #fff;
+      border-color: #e50914;
+      box-shadow: 0 4px 14px rgba(229, 9, 20, 0.45);
+    }
+
+    /* Content Area */
+    .content-area {
+      padding: 0 16px;
+    }
+    .section-label {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #f1f1f1;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .movie-card {
+      background: #131317;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+    .movie-card:active {
+      transform: scale(0.96);
+    }
+    .poster-box {
+      width: 100%;
+      aspect-ratio: 2/3;
+      background: #1c1c22;
+      position: relative;
+    }
+    .poster-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ep-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(8, 8, 10, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      color: #ff3344;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hd-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .meta-box {
+      padding: 10px 10px 12px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .movie-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f5f5f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .movie-sub {
+      font-size: 11px;
+      color: #777;
+    }
+    .movie-sub span {
+      background: #1c1c22;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 9px;
+      color: #999;
+    }
+
+    .status-msg {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    /* Video Player Modal */
+    #playerModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.96);
+      backdrop-filter: blur(10px);
+      z-index: 999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 24px;
+      right: 20px;
+      background: #1c1c22;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .close-btn:active {
+      background: #e50914;
+    }
+    .player-box {
+      width: 100%;
+      max-width: 700px;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: relative;
+    }
+    iframe, video {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Splash Screen with Big Logo -->
+  <div id="splashScreen">
+    <img src="https://i.postimg.cc/267zXfbw/1792969618159.png" class="splash-logo-img" alt="MovieBox Pro">
+    <div class="splash-loader"></div>
+  </div>
+
+  <header>
+    <div class="brand-row">
+      <div class="brand-title">MOVIEBOX</div>
+      <div class="app-ver">v1.0</div>
+    </div>
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Search movies, shows, anime..." oninput="handleSearch()">
+    </div>
+  </header>
+
+  <!-- Featured Banner -->
+  <div id="heroBanner" class="hero-banner">
+    <img id="heroImg" class="hero-img" src="" alt="Featured">
+    <div class="hero-overlay">
+      <div class="hero-tag">TRENDING NOW</div>
+      <div id="heroTitle" class="hero-title">Movie Title</div>
+      <button id="heroBtn" class="hero-btn">▶ Watch Now</button>
+    </div>
+  </div>
+
+  <!-- Category Filter Bar -->
+  <div class="cat-scroll">
+    <div class="cat-pill active" onclick="setCategory('Trending', this)">🔥 Trending</div>
+    <div class="cat-pill" onclick="setCategory('All', this)">All</div>
+    <div class="cat-pill" onclick="setCategory('Bollywood', this)">Bollywood</div>
+    <div class="cat-pill" onclick="setCategory('Hollywood', this)">Hollywood</div>
+    <div class="cat-pill" onclick="setCategory('Kdrama', this)">Kdrama</div>
+    <div class="cat-pill" onclick="setCategory('Webseries', this)">Web Series</div>
+    <div class="cat-pill" onclick="setCategory('Anime', this)">Anime</div>
+  </div>
+
+  <div class="content-area">
+    <div id="sectionTitle" class="section-label">Trending Now</div>
+    <div id="movieGrid" class="movie-grid"></div>
+    <div id="statusMessage" class="status-msg">Fetching movies from your Google Sheet...</div>
+  </div>
+
+  <!-- Player Modal -->
+  <div id="playerModal">
+    <button class="close-btn" onclick="closeVideo()">✕</button>
+    <div class="player-box" id="playerContainer"></div>
+  </div>
+
+  <script>
+    const SHEET_ID = '1guQHHO214B_RbSoViKNpPaZ3MuS3bshw_FVbXTz4cbg';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    let allMovies = [];
+    let currentCategory = 'Trending';
+
+    async function loadData() {
+      try {
+        const res = await fetch(SHEET_URL);
+        const text = await res.text();
+        const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        const rawData = JSON.parse(jsonString);
+        const rows = rawData.table.rows;
+
+        allMovies = rows.map(r => {
+          const c = r.c;
+          return {
+            title: c[0] ? (c[0].v || '') : '',
+            poster: c[1] ? (c[1].v || '') : '',
+            video: c[2] ? (c[2].v || '') : '',
+            category: c[3] ? String(c[3].v || '').trim() : '',
+            episode: c[4] ? String(c[4].v || '').trim() : ''
+          };
+        }).filter(m => m.title !== '');
+
+        document.getElementById('statusMessage').style.display = 'none';
+
+        if (allMovies.length > 0) {
+          const featured = allMovies[0];
+          document.getElementById('heroImg').src = featured.poster;
+          document.getElementById('heroTitle').innerText = featured.title;
+          document.getElementById('heroBtn').onclick = () => playVideo(featured.video);
+          document.getElementById('heroBanner').style.display = 'block';
+        }
+
+        renderMovies();
+      } catch (err) {
+        document.getElementById('statusMessage').innerHTML = '⚠️ Failed to connect sheet.<br>Check internet or sheet sharing settings.';
+      } finally {
+        setTimeout(() => {
+          const splash = document.getElementById('splashScreen');
+          if (splash) {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 500);
+          }
+        }, 1200);
+      }
+    }
+
+    function renderMovies() {
+      const grid = document.getElementById('movieGrid');
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      grid.innerHTML = '';
+
+      let filtered = allMovies;
+
+      if (currentCategory !== 'All') {
+        filtered = filtered.filter(m => {
+          const cats = m.category.toLowerCase().split(',').map(s => s.trim());
+          return cats.includes(currentCategory.toLowerCase());
+        });
+      }
+
+      if (query !== '') {
+        filtered = filtered.filter(m => m.title.toLowerCase().includes(query));
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div style="grid-column: span 2; text-align: center; color: #555; padding: 40px 0; font-size: 13px;">No movies found</div>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+        card.onclick = () => playVideo(item.video);
+
+        const epBadge = item.episode ? `<div class="ep-tag">${item.episode}</div>` : '';
+        const posterImg = item.poster || 'https://via.placeholder.com/300x450?text=No+Poster';
+
+        card.innerHTML = `
+          <div class="poster-box">
+            <img src="${posterImg}" alt="${item.title}" loading="lazy">
+            ${epBadge}
+            <div class="hd-tag">HD</div>
+          </div>
+          <div class="meta-box">
+            <div class="movie-title">${item.title}</div>
+            <div class="movie-sub">
+              <span>${item.category || 'Movie'}</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function setCategory(cat, el) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('sectionTitle').innerText = cat === 'Trending' ? 'Trending Now' : cat;
+      renderMovies();
+    }
+
+    function handleSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      const hero = document.getElementById('heroBanner');
+      if (query !== '') {
+        hero.style.display = 'none';
+      } else if (allMovies.length > 0) {
+        hero.style.display = 'block';
+      }
+      renderMovies();
+    }
+
+    function playVideo(url) {
+      if (!url) {
+        alert('Video link unavailable!');
+        return;
+      }
+      const container = document.getElementById('playerContainer');
+      container.innerHTML = '';
+
+      const cleanUrl = url.trim();
+
+      if (cleanUrl.endsWith('.mp4') || cleanUrl.endsWith('.webm') || cleanUrl.includes('.mp4?')) {
+        const video = document.createElement('video');
+        video.src = cleanUrl;
+        video.controls = true;
+        video.autoplay = true;
+        container.appendChild(video);
+      } else {
+        let finalUrl = cleanUrl;
+        if (cleanUrl.includes('watch?v=')) {
+          finalUrl = cleanUrl.replace('watch?v=', 'embed/');
+        } else if (cleanUrl.includes('youtu.be/')) {
+          finalUrl = cleanUrl.replace('youtu.be/', 'www.youtube.com/embed/');
+        } else if (cleanUrl.includes('drive.google.com') && cleanUrl.includes('/view')) {
+          finalUrl = cleanUrl.replace('/view', '/preview');
+        }
+
+        const separator = finalUrl.includes('?') ? '&' : '?';
+        const iframe = document.createElement('iframe');
+        iframe.src = finalUrl + separator + 'autoplay=1';
+        iframe.allow = 'autoplay; fullscreen';
+        iframe.allowFullscreen = true;
+        container.appendChild(iframe);
+      }
+
+      document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    function closeVideo() {
+      const container = document.getElementById('playerContainer');
+      container.innerHTML = '';
+      document.getElementById('playerModal').style.display = 'none';
+    }
+
+    loadData();
+  </script>
+
+</body>
+</html>
