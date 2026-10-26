@@ -231,7 +231,7 @@
       text-overflow: ellipsis;
     }
 
-    /* Fullscreen Modal View */
+    /* Player Modal */
     #playerModal {
       position: fixed;
       inset: 0;
@@ -268,7 +268,6 @@
       border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
-    /* Fixed Clean 16:9 Cinema Ratio Player Wrapper */
     .player-wrapper {
       position: relative;
       width: 100%;
@@ -346,7 +345,7 @@
       font-weight: 700;
     }
 
-    /* Exit Dialog */
+    /* Exit Modal */
     #exitModal {
       position: fixed;
       inset: 0;
@@ -366,7 +365,6 @@
       max-width: 320px;
       text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     }
 
     .exit-box h3 {
@@ -410,7 +408,6 @@
 </head>
 <body>
 
-  <!-- Built-in Splash Screen -->
   <div id="splashScreen">
     <div class="splash-brand">
       <div class="splash-icon">
@@ -436,7 +433,6 @@
     <div class="movie-grid" id="movieGrid"></div>
   </div>
 
-  <!-- Player Modal -->
   <div id="playerModal">
     <div class="modal-header">
       <div class="close-btn" onclick="closePlayer()">✕</div>
@@ -453,7 +449,6 @@
     </div>
   </div>
 
-  <!-- Exit Pop-up -->
   <div id="exitModal">
     <div class="exit-box">
       <h3>Exit App?</h3>
@@ -471,7 +466,6 @@
     let groupedData = [];
     let isPlayerOpen = false;
 
-    // Splash animation duration (2.2s)
     setTimeout(() => {
       const splash = document.getElementById('splashScreen');
       if (splash) {
@@ -480,29 +474,31 @@
       }
     }, 2200);
 
+    // Advanced CSV Parser for quoted commas
     function parseCSV(text) {
-      const lines = text.split('\n').filter(l => l.trim().length > 0);
-      const rows = [];
-      for (let i = 0; i < lines.length; i++) {
-        let line = lines[i];
-        let values = [];
-        let curr = '';
-        let insideQuote = false;
-        for (let j = 0; j < line.length; j++) {
-          let char = line[j];
-          if (char === '"') {
-            insideQuote = !insideQuote;
-          } else if (char === ',' && !insideQuote) {
-            values.push(curr.trim());
-            curr = '';
-          } else {
-            curr += char;
-          }
+      let p = '', c = '', r = [];
+      let q = false;
+      let row = [''];
+      for (let i = 0; i < text.length; i++) {
+        c = text[i];
+        let next = text[i+1];
+        if (c === '"') {
+          if (q && next === '"') { row[row.length - 1] += '"'; i++; }
+          else { q = !q; }
+        } else if (c === ',' && !q) {
+          row.push('');
+        } else if ((c === '\r' || c === '\n') && !q) {
+          if (c === '\r' && next === '\n') { i++; }
+          r.push(row.map(s => s.trim().replace(/^"|"$/g, '')));
+          row = [''];
+        } else {
+          row[row.length - 1] += c;
         }
-        values.push(curr.trim());
-        rows.push(values);
       }
-      return rows;
+      if (row.length > 1 || row[0] !== '') {
+        r.push(row.map(s => s.trim().replace(/^"|"$/g, '')));
+      }
+      return r;
     }
 
     async function loadData() {
@@ -514,15 +510,14 @@
         const seriesMap = new Map();
 
         rows.forEach(cols => {
-          // Columns: A: Title | B: Image | C: Video Link | D: Category | E: Episode | F: Trending
           const rawTitle = cols[0] || '';
           if (!rawTitle || rawTitle.toLowerCase() === 'title') return;
 
-          const poster = cols[1] || '';
-          let link = cols[2] || '';
-          const category = cols[3] || 'Movie';
-          const epNum = cols[4] || '';
-          const trendingVal = (cols[5] || '').toLowerCase();
+          const poster = (cols[1] || '').trim();
+          let link = (cols[2] || '').trim();
+          const category = (cols[3] || 'Movie').trim();
+          const epNum = (cols[4] || '').trim();
+          const trendingVal = (cols[5] || '').toLowerCase().trim();
           const isTrending = trendingVal.includes('yes') || trendingVal.includes('true') || category.toLowerCase().includes('trending');
 
           if (link.includes('youtu.be/')) {
@@ -628,43 +623,44 @@
       history.pushState({ modalOpen: true }, "");
     }
 
-    // Upgraded Bulletproof Player Engine
+    // Direct Universal Stream Player
     function embedVideo(url) {
       const holder = document.getElementById('playerHolder');
       holder.innerHTML = '';
       if (!url) return;
 
-      url = url.trim();
+      // Strip extra quotes and spaces
+      url = url.replace(/^"+|"+$/g, '').trim();
 
       if (url.includes('drive.google.com')) {
         url = url.replace(/\/view(\?.*)?$/, '/preview');
       }
 
-      const isDirectVideo = url.includes('.mp4') || url.includes('.mkv') || url.includes('.webm') || url.includes('.m3u8');
+      const isDirectVideo = url.endsWith('.mp4') || url.endsWith('.mkv') || url.endsWith('.webm') || url.includes('.mp4?') || url.includes('sample/ForBiggerBlazes.mp4');
 
       if (isDirectVideo) {
-        holder.innerHTML = `
-          <video 
-            src="${url}" 
-            controls 
-            autoplay 
-            playsinline 
-            webkit-playsinline 
-            preload="auto"
-            style="width: 100%; height: 100%; object-fit: contain; background: #000;">
-            Your browser does not support the video tag.
-          </video>
-        `;
+        const video = document.createElement('video');
+        video.src = url;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute('webkit-playsinline', 'true');
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.objectFit = 'contain';
+        video.style.background = '#000';
+        holder.appendChild(video);
+        video.play().catch(e => console.log('Autoplay handled:', e));
       } else {
-        holder.innerHTML = `
-          <iframe 
-            src="${url}" 
-            referrerpolicy="no-referrer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
-            allowfullscreen 
-            style="width: 100%; height: 100%; border: none;">
-          </iframe>
-        `;
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.setAttribute('referrerpolicy', 'no-referrer');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen');
+        iframe.setAttribute('allowfullscreen', 'true');
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        holder.appendChild(iframe);
       }
     }
 
@@ -679,7 +675,7 @@
       }
     }
 
-    // Smart Hardware Back Button Logic
+    // Back Button Handling
     history.pushState(null, null, location.href);
     window.addEventListener('popstate', function (event) {
       if (isPlayerOpen) {
