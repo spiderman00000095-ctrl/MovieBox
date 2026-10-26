@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="referrer" content="no-referrer">
   <title>MovieBox Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -345,7 +346,7 @@
       font-weight: 700;
     }
 
-    /* Exit Dialog Box */
+    /* Exit Dialog */
     #exitModal {
       position: fixed;
       inset: 0;
@@ -409,7 +410,7 @@
 </head>
 <body>
 
-  <!-- Permanent Built-in Splash Screen -->
+  <!-- Built-in Splash Screen -->
   <div id="splashScreen">
     <div class="splash-brand">
       <div class="splash-icon">
@@ -452,7 +453,7 @@
     </div>
   </div>
 
-  <!-- App Exit Confirmation Dialog -->
+  <!-- Exit Pop-up -->
   <div id="exitModal">
     <div class="exit-box">
       <h3>Exit App?</h3>
@@ -470,7 +471,7 @@
     let groupedData = [];
     let isPlayerOpen = false;
 
-    // Splash animation duration
+    // Splash animation duration (2.2s)
     setTimeout(() => {
       const splash = document.getElementById('splashScreen');
       if (splash) {
@@ -479,7 +480,6 @@
       }
     }, 2200);
 
-    // CSV parser to correctly read data with commas
     function parseCSV(text) {
       const lines = text.split('\n').filter(l => l.trim().length > 0);
       const rows = [];
@@ -624,28 +624,45 @@
       embedVideo(item.episodes[0].link);
       document.getElementById('playerModal').style.display = 'flex';
       
-      // Push history state so back button closes modal first
       isPlayerOpen = true;
       history.pushState({ modalOpen: true }, "");
     }
 
+    // Upgraded Bulletproof Player Engine
     function embedVideo(url) {
       const holder = document.getElementById('playerHolder');
       holder.innerHTML = '';
       if (!url) return;
 
+      url = url.trim();
+
       if (url.includes('drive.google.com')) {
         url = url.replace(/\/view(\?.*)?$/, '/preview');
       }
 
-      if (url.includes('.mp4') || url.includes('.mkv')) {
-        holder.innerHTML = `<video controls autoplay playsinline style="width:100%; height:100%; object-fit:contain;"><source src="${url}" type="video/mp4"></video>`;
+      const isDirectVideo = url.includes('.mp4') || url.includes('.mkv') || url.includes('.webm') || url.includes('.m3u8');
+
+      if (isDirectVideo) {
+        holder.innerHTML = `
+          <video 
+            src="${url}" 
+            controls 
+            autoplay 
+            playsinline 
+            webkit-playsinline 
+            preload="auto"
+            style="width: 100%; height: 100%; object-fit: contain; background: #000;">
+            Your browser does not support the video tag.
+          </video>
+        `;
       } else {
         holder.innerHTML = `
           <iframe 
             src="${url}" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-            allowfullscreen>
+            referrerpolicy="no-referrer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" 
+            allowfullscreen 
+            style="width: 100%; height: 100%; border: none;">
           </iframe>
         `;
       }
@@ -662,18 +679,16 @@
       }
     }
 
-    // Hardware / Phone Back Button Handler
+    // Smart Hardware Back Button Logic
     history.pushState(null, null, location.href);
     window.addEventListener('popstate', function (event) {
       if (isPlayerOpen) {
-        // Player open tha, use close karke Home screen par aao
         const modal = document.getElementById('playerModal');
         const holder = document.getElementById('playerHolder');
         holder.innerHTML = '';
         modal.style.display = 'none';
         isPlayerOpen = false;
       } else {
-        // Home Screen par the, exit pop-up dikhao
         showExitDialog();
         history.pushState(null, null, location.href);
       }
@@ -688,7 +703,6 @@
     }
 
     function exitApp() {
-      // Exit Android App WebView
       if (navigator.app && navigator.app.exitApp) {
         navigator.app.exitApp();
       } else if (window.close) {
@@ -707,4 +721,3 @@
   </script>
 </body>
 </html>
-
