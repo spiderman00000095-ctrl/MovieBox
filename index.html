@@ -277,8 +277,7 @@
       overflow: hidden;
     }
 
-    .player-wrapper iframe,
-    .player-wrapper video {
+    .player-wrapper iframe {
       position: absolute;
       top: 0;
       left: 0;
@@ -474,7 +473,6 @@
       }
     }, 2200);
 
-    // Advanced CSV Parser for quoted commas
     function parseCSV(text) {
       let p = '', c = '', r = [];
       let q = false;
@@ -623,45 +621,27 @@
       history.pushState({ modalOpen: true }, "");
     }
 
-    // Direct Universal Stream Player
+    // Fail-proof Universal Player (Handles YouTube, MP4, and Embeds seamlessly)
     function embedVideo(url) {
       const holder = document.getElementById('playerHolder');
       holder.innerHTML = '';
       if (!url) return;
 
-      // Strip extra quotes and spaces
       url = url.replace(/^"+|"+$/g, '').trim();
 
       if (url.includes('drive.google.com')) {
         url = url.replace(/\/view(\?.*)?$/, '/preview');
       }
 
-      const isDirectVideo = url.endsWith('.mp4') || url.endsWith('.mkv') || url.endsWith('.webm') || url.includes('.mp4?') || url.includes('sample/ForBiggerBlazes.mp4');
-
-      if (isDirectVideo) {
-        const video = document.createElement('video');
-        video.src = url;
-        video.controls = true;
-        video.autoplay = true;
-        video.playsInline = true;
-        video.setAttribute('webkit-playsinline', 'true');
-        video.style.width = '100%';
-        video.style.height = '100%';
-        video.style.objectFit = 'contain';
-        video.style.background = '#000';
-        holder.appendChild(video);
-        video.play().catch(e => console.log('Autoplay handled:', e));
-      } else {
-        const iframe = document.createElement('iframe');
-        iframe.src = url;
-        iframe.setAttribute('referrerpolicy', 'no-referrer');
-        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen');
-        iframe.setAttribute('allowfullscreen', 'true');
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.border = 'none';
-        holder.appendChild(iframe);
-      }
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.setAttribute('referrerpolicy', 'no-referrer');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen');
+      iframe.setAttribute('allowfullscreen', 'true');
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      holder.appendChild(iframe);
     }
 
     function closePlayer() {
@@ -675,7 +655,7 @@
       }
     }
 
-    // Back Button Handling
+    // Hardware Back Button
     history.pushState(null, null, location.href);
     window.addEventListener('popstate', function (event) {
       if (isPlayerOpen) {
