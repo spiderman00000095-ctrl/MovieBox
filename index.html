@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>MovieBox Pro</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     * {
       box-sizing: border-box;
@@ -15,9 +15,9 @@
     }
 
     body {
-      background-color: #0d0d11;
+      background-color: #0b0b0e;
       color: #ffffff;
-      padding-bottom: 30px;
+      padding-bottom: 40px;
       overflow-x: hidden;
     }
 
@@ -31,21 +31,48 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.6s ease;
     }
 
-    .splash-logo-img {
-      width: 70%;
-      max-width: 260px;
-      height: auto;
+    .splash-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .splash-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
       border-radius: 20px;
-      margin-bottom: 20px;
-      filter: drop-shadow(0 0 25px rgba(229, 9, 20, 0.6));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 35px rgba(229, 9, 20, 0.7);
+      margin-bottom: 16px;
+    }
+
+    .splash-icon svg {
+      width: 44px;
+      height: 44px;
+      fill: #ffffff;
+    }
+
+    .splash-text {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .splash-text span {
+      color: #e50914;
     }
 
     .splash-loader {
-      width: 35px;
-      height: 35px;
+      width: 36px;
+      height: 36px;
       border: 3.5px solid rgba(255, 255, 255, 0.1);
       border-top: 3.5px solid #e50914;
       border-radius: 50%;
@@ -57,13 +84,13 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* App Header */
+    /* Header */
     header {
       position: sticky;
       top: 0;
-      background: rgba(13, 13, 17, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 12px 18px;
+      background: rgba(11, 11, 14, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 14px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -77,14 +104,14 @@
       color: #fff;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .app-title span {
       color: #e50914;
     }
 
-    /* Search Box */
+    /* Search */
     .search-container {
       padding: 12px 18px;
     }
@@ -92,7 +119,7 @@
     .search-bar {
       width: 100%;
       padding: 12px 16px;
-      background: #181822;
+      background: #171720;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       color: #fff;
@@ -104,7 +131,7 @@
       border-color: #e50914;
     }
 
-    /* Movie Grid */
+    /* Grid */
     .container {
       padding: 6px 18px;
     }
@@ -123,14 +150,15 @@
     }
 
     .movie-card {
-      background: #16161f;
+      background: #15151e;
       border-radius: 14px;
       overflow: hidden;
       cursor: pointer;
       display: flex;
       flex-direction: column;
       border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: transform 0.2s ease;
+      position: relative;
+      transition: transform 0.2s;
     }
 
     .movie-card:active {
@@ -140,7 +168,7 @@
     .poster-box {
       width: 100%;
       aspect-ratio: 2 / 3;
-      background: #20202c;
+      background: #1f1f2b;
       overflow: hidden;
       position: relative;
     }
@@ -149,6 +177,34 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+
+    .badge-trending {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #ff3838;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    .badge-series {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #e50914;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
     }
 
     .movie-info {
@@ -168,28 +224,36 @@
       font-size: 11px;
       color: #8c8c9e;
       margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* Video Player Modal */
+    /* Player Modal */
     #playerModal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.95);
+      background: #0b0b0e;
       z-index: 10000;
       display: none;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      position: relative;
+      width: 100%;
+      background: #000;
     }
 
     .close-btn {
       position: absolute;
-      top: 18px;
-      right: 18px;
+      top: 14px;
+      right: 14px;
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.7);
       color: #fff;
       display: flex;
       justify-content: center;
@@ -197,17 +261,13 @@
       font-size: 20px;
       cursor: pointer;
       z-index: 10001;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .player-wrapper {
       width: 100%;
-      max-width: 800px;
       aspect-ratio: 16 / 9;
       background: #000;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .player-wrapper iframe,
@@ -215,95 +275,227 @@
       width: 100%;
       height: 100%;
       border: none;
-      outline: none;
+    }
+
+    .modal-body {
+      padding: 16px;
+    }
+
+    .current-playing-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .current-playing-cat {
+      font-size: 12px;
+      color: #8c8c9e;
+      margin-top: 3px;
+      margin-bottom: 16px;
+    }
+
+    .episodes-section {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+    }
+
+    .episodes-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e50914;
+      margin-bottom: 12px;
+    }
+
+    .episodes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+    }
+
+    .ep-btn {
+      background: #171720;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 8px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.2s;
+    }
+
+    .ep-btn.active {
+      background: #e50914;
+      border-color: #e50914;
+      font-weight: 700;
     }
   </style>
 </head>
 <body>
 
-  <!-- Splash Screen -->
+  <!-- Permanent Built-in Splash Screen -->
   <div id="splashScreen">
-    <img src="https://images2.imgbox.com/f0/fb/zK1p0Sfe_o.png" class="splash-logo-img" alt="MovieBox Logo">
+    <div class="splash-brand">
+      <div class="splash-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 6.47v11.06c0 1.55 1.7 2.51 3.03 1.72l9.22-5.53c1.3-.78 1.3-2.66 0-3.44L7.03 4.75C5.7 3.96 4 4.92 4 6.47z"/>
+        </svg>
+      </div>
+      <div class="splash-text">MovieBox <span>Pro</span></div>
+    </div>
     <div class="splash-loader"></div>
   </div>
 
-  <!-- Header -->
   <header>
     <div class="app-title">MovieBox <span>Pro</span></div>
   </header>
 
-  <!-- Search -->
   <div class="search-container">
     <input type="text" id="searchInput" class="search-bar" placeholder="Search movies or series...">
   </div>
 
-  <!-- Content -->
   <div class="container">
-    <div class="section-title">All Content</div>
-    <div class="movie-grid" id="movieGrid">
-      <!-- Cards load automatically from sheet -->
-    </div>
+    <div class="section-title">All Movies & Series</div>
+    <div class="movie-grid" id="movieGrid"></div>
   </div>
 
-  <!-- Universal Auto Player Modal -->
+  <!-- Player Modal -->
   <div id="playerModal">
-    <div class="close-btn" onclick="closePlayer()">✕</div>
-    <div class="player-wrapper" id="playerHolder">
-      <!-- Iframe / Video dynamically injects here -->
+    <div class="modal-header">
+      <div class="close-btn" onclick="closePlayer()">✕</div>
+      <div class="player-wrapper" id="playerHolder"></div>
+    </div>
+    <div class="modal-body">
+      <div class="current-playing-title" id="modalTitle"></div>
+      <div class="current-playing-cat" id="modalCat"></div>
+      
+      <div class="episodes-section" id="episodesBox" style="display:none;">
+        <div class="episodes-title">Select Episode</div>
+        <div class="episodes-grid" id="episodesList"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Sheet CSV Link: Apni Google Sheet ka published CSV link yahan paste karein
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1guQHHO214B_RbSoViKNpPaZ3MuS3bshw_FVbXTz4cbg/export?format=csv";
     
+    let groupedData = [];
 
-    let allMovies = [];
-
-    // Hide Splash Screen after loading
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const splash = document.getElementById('splashScreen');
+    // Splash animation
+    setTimeout(() => {
+      const splash = document.getElementById('splashScreen');
+      if (splash) {
         splash.style.opacity = '0';
-        setTimeout(() => splash.style.display = 'none', 500);
-      }, 1000);
-    });
+        setTimeout(() => splash.style.display = 'none', 600);
+      }
+    }, 2200);
 
-    // Fetch movies from Google Sheet
-    async function loadMovies() {
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(l => l.trim().length > 0);
+      const rows = [];
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        let values = [];
+        let curr = '';
+        let insideQuote = false;
+        for (let j = 0; j < line.length; j++) {
+          let char = line[j];
+          if (char === '"') {
+            insideQuote = !insideQuote;
+          } else if (char === ',' && !insideQuote) {
+            values.push(curr.trim());
+            curr = '';
+          } else {
+            curr += char;
+          }
+        }
+        values.push(curr.trim());
+        rows.push(values);
+      }
+      return rows;
+    }
+
+    async function loadData() {
       try {
         const res = await fetch(SHEET_CSV_URL);
         const data = await res.text();
-        const rows = data.split('\n').slice(1); // Pehli header row chhodkar
+        const rows = parseCSV(data);
 
-        allMovies = rows.map(row => {
-          const cols = row.split(',');
-          return {
-            title: cols[0]?.trim() || 'Untitled',
-            category: cols[1]?.trim() || 'Movie',
-            poster: cols[2]?.trim() || '',
-            link: cols[3]?.trim() || ''
-          };
-        }).filter(m => m.title && m.link);
+        const seriesMap = new Map();
 
-        renderMovies(allMovies);
+        rows.forEach(cols => {
+          const rawTitle = cols[0] || '';
+          if (!rawTitle || rawTitle.toLowerCase() === 'title') return;
+
+          const poster = cols[1] || '';
+          let link = cols[2] || '';
+          const category = cols[3] || 'Movie';
+          const epNum = cols[4] || '';
+          const trendingVal = (cols[5] || '').toLowerCase();
+          const isTrending = trendingVal.includes('yes') || trendingVal.includes('true') || category.toLowerCase().includes('trending');
+
+          if (link.includes('youtu.be/')) {
+            const vidId = link.split('youtu.be/')[1]?.split('?')[0];
+            link = `https://www.youtube.com/embed/${vidId}`;
+          } else if (link.includes('youtube.com/watch?v=')) {
+            const vidId = link.split('v=')[1]?.split('&')[0];
+            link = `https://www.youtube.com/embed/${vidId}`;
+          }
+
+          let mainTitle = rawTitle.trim();
+          let epLabel = epNum ? epNum.trim() : '';
+
+          if (!seriesMap.has(mainTitle)) {
+            seriesMap.set(mainTitle, {
+              title: mainTitle,
+              category: category,
+              poster: poster,
+              isTrending: isTrending,
+              isSeries: !!epLabel || category.toLowerCase().includes('series'),
+              episodes: []
+            });
+          }
+
+          const current = seriesMap.get(mainTitle);
+          if (link) {
+            current.episodes.push({
+              label: epLabel || `Part ${current.episodes.length + 1}`,
+              link: link
+            });
+          }
+          if (poster && (!current.poster || current.poster.includes('placeholder'))) {
+            current.poster = poster;
+          }
+          if (isTrending) {
+            current.isTrending = true;
+          }
+        });
+
+        groupedData = Array.from(seriesMap.values());
+        renderGrid(groupedData);
       } catch (err) {
-        console.error("Sheet load error: ", err);
+        console.error("Sheet Error:", err);
       }
     }
 
-    function renderMovies(movies) {
+    function renderGrid(list) {
       const grid = document.getElementById('movieGrid');
       grid.innerHTML = '';
 
-      movies.forEach(item => {
+      list.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'movie-card';
-        card.onclick = () => playMedia(item.link);
+        card.onclick = () => openItem(index);
 
         card.innerHTML = `
           <div class="poster-box">
-            <img src="${item.poster || 'https://via.placeholder.com/300x450'}" alt="${item.title}" loading="lazy">
+            <img src="${item.poster || 'https://via.placeholder.com/300x450'}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300x450'">
+            ${item.isTrending ? `<div class="badge-trending">🔥 Hot</div>` : ''}
+            ${item.isSeries ? `<div class="badge-series">Series</div>` : ''}
           </div>
           <div class="movie-info">
             <div class="movie-name">${item.title}</div>
@@ -314,50 +506,72 @@
       });
     }
 
-    // Smart Player Logic (Handles both raw MP4 & Embed Links)
-    function playMedia(url) {
-      const modal = document.getElementById('playerModal');
+    function openItem(index) {
+      const item = groupedData[index];
+      if (!item || !item.episodes.length) return;
+
+      document.getElementById('modalTitle').innerText = item.title;
+      document.getElementById('modalCat').innerText = item.category;
+
+      const epBox = document.getElementById('episodesBox');
+      const epList = document.getElementById('episodesList');
+      epList.innerHTML = '';
+
+      if (item.episodes.length > 1 || item.isSeries) {
+        epBox.style.display = 'block';
+        item.episodes.forEach((ep, i) => {
+          const btn = document.createElement('div');
+          btn.className = `ep-btn ${i === 0 ? 'active' : ''}`;
+          btn.innerText = ep.label;
+          btn.onclick = () => {
+            document.querySelectorAll('.ep-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            embedVideo(ep.link);
+          };
+          epList.appendChild(btn);
+        });
+      } else {
+        epBox.style.display = 'none';
+      }
+
+      embedVideo(item.episodes[0].link);
+      document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    // Updated Smart Player Function
+    function embedVideo(url) {
       const holder = document.getElementById('playerHolder');
       holder.innerHTML = '';
+      if (!url) return;
 
       if (url.includes('.mp4') || url.includes('.mkv')) {
-        // Direct MP4 Video Tag
-        holder.innerHTML = `
-          <video controls autoplay playsinline style="width:100%; height:100%;">
-            <source src="${url}" type="video/mp4">
-          </video>
-        `;
+        holder.innerHTML = `<video controls autoplay playsinline style="width:100%; height:100%;"><source src="${url}" type="video/mp4"></video>`;
       } else {
-        // Embed Player (VidSrc, MultiEmbed, AutoEmbed, etc.)
         holder.innerHTML = `
           <iframe 
             src="${url}" 
-            allow="autoplay; encrypted-media; fullscreen" 
+            style="width: 100%; height: 100%; border: none;"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             allowfullscreen 
             scrolling="no">
           </iframe>
         `;
       }
-
-      modal.style.display = 'flex';
     }
 
     function closePlayer() {
       const modal = document.getElementById('playerModal');
       const holder = document.getElementById('playerHolder');
-      holder.innerHTML = ''; // Video stop karne ke liye
+      holder.innerHTML = '';
       modal.style.display = 'none';
     }
 
-    // Search Filter
     document.getElementById('searchInput').addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      const filtered = allMovies.filter(m => m.title.toLowerCase().includes(query));
-      renderMovies(filtered);
+      const q = e.target.value.toLowerCase();
+      renderGrid(groupedData.filter(m => m.title.toLowerCase().includes(q)));
     });
 
-    // Start fetching
-    loadMovies();
+    loadData();
   </script>
 </body>
 </html>
